@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.herve.library.matisse.OnAdapterItemClickListener
 import com.herve.library.matisse.R
-import com.herve.library.matisse.adapter.CustomAdapter
+import com.herve.library.matisse.adapter.MediaAdapter
 
 class MatisseActivity : AppCompatActivity() {
 
-    private lateinit var customAdapter: CustomAdapter
+    private lateinit var mediaAdapter: MediaAdapter
 
     /**
      * 启动本界面
@@ -26,8 +26,8 @@ class MatisseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_matisse)
 
-        customAdapter = CustomAdapter()
-        customAdapter.setAdapterItemClickListener(object : OnAdapterItemClickListener {
+        mediaAdapter = MediaAdapter()
+        mediaAdapter.setAdapterItemClickListener(object : OnAdapterItemClickListener {
             override fun onAdapterItemClick() {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }

@@ -1,9 +1,13 @@
 package com.herve.library.matisse.adapter
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.herve.library.matisse.OnAdapterItemClickListener
+import com.herve.library.matisse.R
+import com.herve.library.matisse.internal.entity.midea.BaseMedia
 
 /**
  * Created by Lijianyou on 2018-09-05.
@@ -11,23 +15,22 @@ import com.herve.library.matisse.OnAdapterItemClickListener
  *
  */
 
-class CustomAdapter : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+class MediaAdapter(val mContext: Context, var mWrapperList: MutableList<BaseMedia>) : RecyclerView.Adapter<MediaAdapter.ViewHolder>() {
 
+    private val mLayoutInflater: LayoutInflater = LayoutInflater.from(mContext)
     private lateinit var mOnAdapterItemClickListener: OnAdapterItemClickListener
-    private val mWrapperList: MutableList<ItemWrapper> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val view = mLayoutInflater.inflate(R.layout.item_media, parent, false)
+        return ViewHolder(view)
     }
 
     override fun getItemCount(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return mWrapperList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
 
     class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
