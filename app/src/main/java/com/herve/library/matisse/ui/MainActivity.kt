@@ -10,9 +10,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        btn_media_store.setOnClickListener({
+        btn_media_store.setOnClickListener {
             MatisseActivity.launch(this)
-        })
+
+        }
     }
 }

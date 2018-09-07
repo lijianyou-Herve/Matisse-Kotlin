@@ -8,8 +8,8 @@ package com.herve.library.matisse.internal.entity.midea
 class PhotoMedia(
         fileName: String,
         filePath: String,
-        fileSize: Long,
-        mediaLength: Long)
+        val fileSize: Long,
+        val mediaLength: Long)
     : BaseMedia(fileName, filePath) {
 
 

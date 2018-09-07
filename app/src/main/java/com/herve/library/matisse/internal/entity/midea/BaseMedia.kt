@@ -5,6 +5,6 @@ package com.herve.library.matisse.internal.entity.midea
  * @author  Lijianyou
  *
  */
-open class BaseMedia(fileName: String, filePath: String) {
+open class BaseMedia(val fileName: String,val filePath: String) {
 
 }
