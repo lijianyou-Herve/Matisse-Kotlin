@@ -11,18 +11,21 @@ import com.herve.library.matisse.internal.entity.Item
  *
  */
 abstract class Filter {
-    /**
-     * Convenient constant for a minimum value.
-     */
-    val MIN = 0
-    /**
-     * Convenient constant for a maximum value.
-     */
-    val MAX = Integer.MAX_VALUE
-    /**
-     * Convenient constant for 1024.
-     */
-    val K = 1024
+
+    companion object {
+        /**
+         * Convenient constant for a minimum value.
+         */
+        val MIN = 0
+        /**
+         * Convenient constant for a maximum value.
+         */
+        val MAX = Integer.MAX_VALUE
+        /**
+         * Convenient constant for 1024.
+         */
+        val K = 1024
+    }
 
     /**
      * Against what mime types this filter applies.
@@ -34,7 +37,7 @@ abstract class Filter {
      *
      * @return null if selectable, [IncapableCause] if not selectable.
      */
-    public abstract fun filter(context: Context, item: Item): IncapableCause
+    public abstract fun filter(context: Context, item: Item): IncapableCause?
 
     /**
      * Whether an [Item] need filtering.

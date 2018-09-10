@@ -7,6 +7,8 @@ import com.herve.library.matisse.engine.ImageEngine
 import com.herve.library.matisse.engine.impl.GlideEngine
 import com.herve.library.matisse.internal.MimeType
 import com.herve.library.matisse.internal.filter.Filter
+import com.herve.library.matisse.internal.ofImage
+import com.herve.library.matisse.internal.ofVideo
 import com.herve.library.matisse.listener.OnCheckedListener
 import com.herve.library.matisse.listener.OnSelectedListener
 
@@ -44,15 +46,17 @@ class SelectionSpec {
         fun getInstance(): SelectionSpec {
             return InstanceHolder.INSTANCE
         }
+
+        fun getCleanInstance(): SelectionSpec {
+            val selectionSpec = getInstance()
+            selectionSpec.reset()
+            return selectionSpec
+        }
     }
 
     private constructor()
 
-    fun getCleanInstance(): SelectionSpec {
-        val selectionSpec = getInstance()
-        selectionSpec.reset()
-        return selectionSpec
-    }
+
 
     private fun reset() {
         mimeTypeSet = null
@@ -85,11 +89,11 @@ class SelectionSpec {
     }
 
     fun onlyShowImages(): Boolean {
-        return showSingleMediaType && MimeType.ofImage().containsAll(mimeTypeSet!!)
+        return showSingleMediaType && ofImage().containsAll(mimeTypeSet!!)
     }
 
     fun onlyShowVideos(): Boolean {
-        return showSingleMediaType && MimeType.ofVideo().containsAll(mimeTypeSet!!)
+        return showSingleMediaType && ofVideo().containsAll(mimeTypeSet!!)
     }
 
     private object InstanceHolder {

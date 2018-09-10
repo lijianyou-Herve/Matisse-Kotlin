@@ -16,7 +16,6 @@
 package com.zhihu.matisse.internal.ui.adapter
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.database.Cursor
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -29,14 +28,14 @@ import android.widget.TextView
 import com.herve.library.matisse.R
 import com.herve.library.matisse.internal.entity.Album
 import com.herve.library.matisse.internal.entity.SelectionSpec
-
 import java.io.File
 
 class AlbumsAdapter : CursorAdapter {
 
     private val mPlaceholder: Drawable?
+    private val c: Cursor? = null
 
-    constructor(context: Context, c: Cursor, autoRequery: Boolean) : super(context, c, autoRequery) {
+    constructor(context: Context, autoRequery: Boolean) : super(context, null, autoRequery) {
 
         val ta = context.theme.obtainStyledAttributes(
                 intArrayOf(R.attr.album_thumbnail_placeholder))
@@ -44,7 +43,7 @@ class AlbumsAdapter : CursorAdapter {
         ta.recycle()
     }
 
-    constructor(context: Context, c: Cursor, flags: Int) : super(context, c, flags) {
+    constructor(context: Context, flags: Int) : super(context, null, flags) {
 
         val ta = context.theme.obtainStyledAttributes(
                 intArrayOf(R.attr.album_thumbnail_placeholder))

@@ -24,17 +24,9 @@ import com.herve.library.matisse.internal.entity.IncapableCause
 import com.herve.library.matisse.internal.entity.Item
 import com.herve.library.matisse.internal.entity.SelectionSpec
 import com.herve.library.matisse.internal.utils.PhotoMetadataUtils
-
-import com.zhihu.matisse.R
-import com.zhihu.matisse.internal.entity.IncapableCause
-import com.zhihu.matisse.internal.entity.Item
-import com.zhihu.matisse.internal.entity.SelectionSpec
 import com.zhihu.matisse.internal.ui.widget.CheckView
 import com.zhihu.matisse.internal.utils.PathUtils
-import com.zhihu.matisse.internal.utils.PhotoMetadataUtils
-
-import java.util.ArrayList
-import java.util.LinkedHashSet
+import java.util.*
 
 class SelectedItemCollection(private val mContext: Context) {
     private var mItems: MutableSet<Item>? = null
@@ -136,7 +128,7 @@ class SelectedItemCollection(private val mContext: Context) {
     fun asListOfString(): List<String> {
         val paths = ArrayList<String>()
         for (item in mItems!!) {
-            paths.add(PathUtils.getPath(mContext, item.getContentUri()))
+            paths.add(PathUtils.getPath(mContext, item.getContentUri())!!)
         }
         return paths
     }
@@ -149,13 +141,11 @@ class SelectedItemCollection(private val mContext: Context) {
         if (maxSelectableReached()) {
             val maxSelectable = currentMaxSelectable()
             var cause: String
-
             try {
-//                cause = mContext.resources.getQuantityString(
-//                        R.plurals.error_over_count,
-//                        maxSelectable,
-//                        maxSelectable
-//                )
+                cause = mContext.getString(
+                        R.string.error_over_count,
+                        maxSelectable
+                )
             } catch (e: Resources.NotFoundException) {
                 cause = mContext.getString(
                         R.string.error_over_count,
@@ -198,8 +188,8 @@ class SelectedItemCollection(private val mContext: Context) {
         var hasImage = false
         var hasVideo = false
         for (i in mItems!!) {
-            if (i.isImage && !hasImage) hasImage = true
-            if (i.isVideo && !hasVideo) hasVideo = true
+            if (i.isImage() && !hasImage) hasImage = true
+            if (i.isVideo() && !hasVideo) hasVideo = true
         }
         if (hasImage && hasVideo) {
             collectionType = COLLECTION_MIXED
@@ -215,7 +205,7 @@ class SelectedItemCollection(private val mContext: Context) {
      * while [SelectionSpec.mediaTypeExclusive] is set to false.
      */
     fun typeConflict(item: Item): Boolean {
-        return SelectionSpec.getInstance().mediaTypeExclusive && (item.isImage && (collectionType == COLLECTION_VIDEO || collectionType == COLLECTION_MIXED) || item.isVideo && (collectionType == COLLECTION_IMAGE || collectionType == COLLECTION_MIXED))
+        return SelectionSpec.getInstance().mediaTypeExclusive && (item.isImage() && (collectionType == COLLECTION_VIDEO || collectionType == COLLECTION_MIXED) || item.isVideo() && (collectionType == COLLECTION_IMAGE || collectionType == COLLECTION_MIXED))
     }
 
     fun count(): Int {

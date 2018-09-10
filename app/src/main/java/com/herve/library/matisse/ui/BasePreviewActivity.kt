@@ -24,9 +24,9 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
-import android.widget.TextView
 import com.herve.library.matisse.R
 import com.herve.library.matisse.internal.entity.IncapableCause
+import com.herve.library.matisse.internal.entity.Item
 import com.herve.library.matisse.internal.entity.SelectionSpec
 import com.herve.library.matisse.internal.utils.PhotoMetadataUtils
 import com.zhihu.matisse.internal.model.SelectedItemCollection
@@ -34,21 +34,14 @@ import com.zhihu.matisse.internal.ui.adapter.PreviewPagerAdapter
 import com.zhihu.matisse.internal.ui.widget.CheckRadioView
 import com.zhihu.matisse.internal.ui.widget.CheckView
 import com.zhihu.matisse.internal.ui.widget.IncapableDialog
-
 import com.zhihu.matisse.internal.utils.Platform
+import kotlinx.android.synthetic.main.activity_media_preview.*
 
 abstract class BasePreviewActivity : AppCompatActivity(), View.OnClickListener, ViewPager.OnPageChangeListener {
 
     protected val mSelectedCollection = SelectedItemCollection(this)
-    protected var mSpec: SelectionSpec
-    protected var mPager: ViewPager
-
-    protected var mAdapter: PreviewPagerAdapter
-
-    protected var mCheckView: CheckView
-    protected var mButtonBack: TextView
-    protected var mButtonApply: TextView
-    protected var mSize: TextView
+    protected var mSpec: SelectionSpec = SelectionSpec.getInstance()
+    protected var mAdapter: PreviewPagerAdapter? = null
 
     protected var mPreviousPos = -1
 
@@ -69,7 +62,6 @@ abstract class BasePreviewActivity : AppCompatActivity(), View.OnClickListener, 
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         }
 
-        mSpec = SelectionSpec.getInstance()
         if (mSpec.needOrientationRestriction()) {
             requestedOrientation = mSpec.orientation
         }
@@ -81,42 +73,37 @@ abstract class BasePreviewActivity : AppCompatActivity(), View.OnClickListener, 
             mSelectedCollection.onCreate(savedInstanceState)
             mOriginalEnable = savedInstanceState.getBoolean(CHECK_STATE)
         }
-        mButtonBack = findViewById<View>(R.id.button_back) as TextView
-        mButtonApply = findViewById<View>(R.id.button_apply) as TextView
-        mSize = findViewById<View>(R.id.size) as TextView
-        mButtonBack.setOnClickListener(this)
-        mButtonApply.setOnClickListener(this)
+        button_back.setOnClickListener(this)
+        button_apply.setOnClickListener(this)
 
-        mPager = findViewById<View>(R.id.pager) as ViewPager
-        mPager.addOnPageChangeListener(this)
+        pager.addOnPageChangeListener(this)
         mAdapter = PreviewPagerAdapter(supportFragmentManager, null)
-        mPager.adapter = mAdapter
-        mCheckView = findViewById<View>(R.id.check_view) as CheckView
-        mCheckView.setCountable(mSpec.countable)
+        pager.adapter = mAdapter
+        check_view.setCountable(mSpec.countable)
 
-        mCheckView.setOnClickListener {
-            val item = mAdapter.getMediaItem(mPager.currentItem)
-            if (mSelectedCollection.isSelected(item)) {
+        check_view.setOnClickListener {
+            val item = mAdapter?.getMediaItem(pager.currentItem)
+            if (mSelectedCollection.isSelected(item!!)) {
                 mSelectedCollection.remove(item)
                 if (mSpec.countable) {
-                    mCheckView.setCheckedNum(CheckView.UNCHECKED)
+                    check_view.setCheckedNum(CheckView.UNCHECKED)
                 } else {
-                    mCheckView.setChecked(false)
+                    check_view.setChecked(false)
                 }
             } else {
                 if (assertAddSelection(item)) {
                     mSelectedCollection.add(item)
                     if (mSpec.countable) {
-                        mCheckView.setCheckedNum(mSelectedCollection.checkedNumOf(item))
+                        check_view.setCheckedNum(mSelectedCollection.checkedNumOf(item))
                     } else {
-                        mCheckView.setChecked(true)
+                        check_view.setChecked(true)
                     }
                 }
             }
             updateApplyButton()
 
             if (mSpec.onSelectedListener != null) {
-                mSpec.onSelectedListener.onSelected(
+                mSpec.onSelectedListener!!.onSelected(
                         mSelectedCollection.asListOfUri(), mSelectedCollection.asListOfString())
             }
         }
@@ -142,7 +129,7 @@ abstract class BasePreviewActivity : AppCompatActivity(), View.OnClickListener, 
 
 
             if (mSpec.onCheckedListener != null) {
-                mSpec.onCheckedListener.onCheck(mOriginalEnable)
+                mSpec.onCheckedListener!!.onCheck(mOriginalEnable)
             }
         })
 
@@ -174,26 +161,26 @@ abstract class BasePreviewActivity : AppCompatActivity(), View.OnClickListener, 
     }
 
     override fun onPageSelected(position: Int) {
-        val adapter = mPager.adapter as PreviewPagerAdapter?
+        val adapter = pager.adapter as PreviewPagerAdapter?
         if (mPreviousPos != -1 && mPreviousPos != position) {
-            (adapter!!.instantiateItem(mPager, mPreviousPos) as PreviewItemFragment).resetView()
+            (adapter!!.instantiateItem(pager, mPreviousPos) as PreviewItemFragment).resetView()
 
             val item = adapter.getMediaItem(position)
             if (mSpec.countable) {
                 val checkedNum = mSelectedCollection.checkedNumOf(item)
-                mCheckView.setCheckedNum(checkedNum)
+                check_view.setCheckedNum(checkedNum)
                 if (checkedNum > 0) {
-                    mCheckView.isEnabled = true
+                    check_view.isEnabled = true
                 } else {
-                    mCheckView.isEnabled = !mSelectedCollection.maxSelectableReached()
+                    check_view.isEnabled = !mSelectedCollection.maxSelectableReached()
                 }
             } else {
                 val checked = mSelectedCollection.isSelected(item)
-                mCheckView.setChecked(checked)
+                check_view.setChecked(checked)
                 if (checked) {
-                    mCheckView.isEnabled = true
+                    check_view.isEnabled = true
                 } else {
-                    mCheckView.isEnabled = !mSelectedCollection.maxSelectableReached()
+                    check_view.isEnabled = !mSelectedCollection.maxSelectableReached()
                 }
             }
             updateSize(item)
@@ -208,14 +195,14 @@ abstract class BasePreviewActivity : AppCompatActivity(), View.OnClickListener, 
     private fun updateApplyButton() {
         val selectedCount = mSelectedCollection.count()
         if (selectedCount == 0) {
-            mButtonApply.setText(R.string.button_sure_default)
-            mButtonApply.isEnabled = false
+            button_apply.setText(R.string.button_sure_default)
+            button_apply.isEnabled = false
         } else if (selectedCount == 1 && mSpec.singleSelectionModeEnabled()) {
-            mButtonApply.setText(R.string.button_sure_default)
-            mButtonApply.isEnabled = true
+            button_apply.setText(R.string.button_sure_default)
+            button_apply.isEnabled = true
         } else {
-            mButtonApply.isEnabled = true
-            mButtonApply.text = getString(R.string.button_sure, selectedCount)
+            button_apply.isEnabled = true
+            button_apply.text = getString(R.string.button_sure, selectedCount)
         }
 
         if (mSpec.originalable) {
@@ -254,7 +241,7 @@ abstract class BasePreviewActivity : AppCompatActivity(), View.OnClickListener, 
         val selectedCount = mSelectedCollection.count()
         for (i in 0 until selectedCount) {
             val item = mSelectedCollection.asList()[i]
-            if (item.isImage) {
+            if (item.isImage()) {
                 val size = PhotoMetadataUtils.getSizeInMB(item.size)
                 if (size > mSpec.originalMaxSize) {
                     count++
@@ -265,14 +252,14 @@ abstract class BasePreviewActivity : AppCompatActivity(), View.OnClickListener, 
     }
 
     protected fun updateSize(item: Item) {
-        if (item.isGif) {
-            mSize.visibility = View.VISIBLE
-            mSize.text = PhotoMetadataUtils.getSizeInMB(item.size).toString() + "M"
+        if (item.isGif()) {
+            tvSize.visibility = View.VISIBLE
+            tvSize.text = PhotoMetadataUtils.getSizeInMB(item.size).toString() + "M"
         } else {
-            mSize.visibility = View.GONE
+            tvSize.visibility = View.GONE
         }
 
-        if (item.isVideo) {
+        if (item.isVideo()) {
             mOriginalLayout!!.visibility = View.GONE
         } else if (mSpec.originalable) {
             mOriginalLayout!!.visibility = View.VISIBLE

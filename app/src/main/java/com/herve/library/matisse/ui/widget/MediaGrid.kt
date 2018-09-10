@@ -27,17 +27,15 @@ import android.widget.TextView
 import com.herve.library.matisse.R
 import com.herve.library.matisse.internal.entity.Item
 import com.herve.library.matisse.internal.entity.SelectionSpec
+import kotlinx.android.synthetic.main.media_grid_content.view.*
 
 class MediaGrid : SquareFrameLayout, View.OnClickListener {
 
-    private var mThumbnail: ImageView? = null
-    private var mCheckView: CheckView? = null
-    private var mGifTag: ImageView? = null
-    private var mVideoDuration: TextView? = null
-
-    var media: Item? = null
-        private set
-    private var mPreBindInfo: PreBindInfo? = null
+    private lateinit var mThumbnail: ImageView
+    private lateinit var mGifTag: ImageView
+    private lateinit var mVideoDuration: TextView
+    private lateinit var media: Item
+    private lateinit var mPreBindInfo: PreBindInfo
     private var mListener: OnMediaGridClickListener? = null
 
     constructor(context: Context) : super(context) {
@@ -52,20 +50,19 @@ class MediaGrid : SquareFrameLayout, View.OnClickListener {
         LayoutInflater.from(context).inflate(R.layout.media_grid_content, this, true)
 
         mThumbnail = findViewById<View>(R.id.media_thumbnail) as ImageView
-        mCheckView = findViewById<View>(R.id.check_view) as CheckView
         mGifTag = findViewById<View>(R.id.gif) as ImageView
         mVideoDuration = findViewById<View>(R.id.video_duration) as TextView
 
-        mThumbnail!!.setOnClickListener(this)
-        mCheckView!!.setOnClickListener(this)
+        mThumbnail.setOnClickListener(this)
+        check_view.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
         if (mListener != null) {
             if (v === mThumbnail) {
-                mListener!!.onThumbnailClicked(mThumbnail, media, mPreBindInfo!!.mViewHolder)
-            } else if (v === mCheckView) {
-                mListener!!.onCheckViewClicked(mCheckView, media, mPreBindInfo!!.mViewHolder)
+                mListener?.onThumbnailClicked(mThumbnail, media, mPreBindInfo.mViewHolder)
+            } else if (v === check_view) {
+                mListener?.onCheckViewClicked(check_view, media, mPreBindInfo.mViewHolder)
             }
         }
     }
@@ -83,41 +80,41 @@ class MediaGrid : SquareFrameLayout, View.OnClickListener {
     }
 
     private fun setGifTag() {
-        mGifTag!!.visibility = if (media!!.isGif()) View.VISIBLE else View.GONE
+        mGifTag.visibility = if (media.isGif()) View.VISIBLE else View.GONE
     }
 
     private fun initCheckView() {
-        mCheckView!!.setCountable(mPreBindInfo!!.mCheckViewCountable)
+        check_view.setCountable(mPreBindInfo.check_viewCountable)
     }
 
     fun setCheckEnabled(enabled: Boolean) {
-        mCheckView!!.isEnabled = enabled
+        check_view.isEnabled = enabled
     }
 
     fun setCheckedNum(checkedNum: Int) {
-        mCheckView!!.setCheckedNum(checkedNum)
+        check_view.setCheckedNum(checkedNum)
     }
 
     fun setChecked(checked: Boolean) {
-        mCheckView!!.setChecked(checked)
+        check_view.setChecked(checked)
     }
 
     private fun setImage() {
-        if (media!!.isGif()) {
-            SelectionSpec.getInstance().imageEngine.loadGifThumbnail(context, mPreBindInfo!!.mResize,
-                    mPreBindInfo!!.mPlaceholder, mThumbnail!!, media!!.getContentUri())
+        if (media.isGif()) {
+            SelectionSpec.getInstance().imageEngine.loadGifThumbnail(context, mPreBindInfo.mResize,
+                    mPreBindInfo.mPlaceholder, mThumbnail, media.getContentUri())
         } else {
-            SelectionSpec.getInstance().imageEngine.loadThumbnail(context, mPreBindInfo!!.mResize,
-                    mPreBindInfo!!.mPlaceholder, mThumbnail!!, media!!.getContentUri())
+            SelectionSpec.getInstance().imageEngine.loadThumbnail(context, mPreBindInfo.mResize,
+                    mPreBindInfo.mPlaceholder, mThumbnail, media.getContentUri())
         }
     }
 
     private fun setVideoDuration() {
-        if (media!!.isVideo()) {
-            mVideoDuration!!.visibility = View.VISIBLE
-            mVideoDuration!!.text = DateUtils.formatElapsedTime(media!!.duration / 1000)
+        if (media.isVideo()) {
+            mVideoDuration.visibility = View.VISIBLE
+            mVideoDuration.text = DateUtils.formatElapsedTime(media.duration / 1000)
         } else {
-            mVideoDuration!!.visibility = View.GONE
+            mVideoDuration.visibility = View.GONE
         }
     }
 
@@ -131,12 +128,12 @@ class MediaGrid : SquareFrameLayout, View.OnClickListener {
 
     interface OnMediaGridClickListener {
 
-        fun onThumbnailClicked(thumbnail: ImageView?, item: Item?, holder: RecyclerView.ViewHolder)
+        fun onThumbnailClicked(thumbnail: ImageView, item: Item, holder: RecyclerView.ViewHolder)
 
-        fun onCheckViewClicked(checkView: CheckView?, item: Item?, holder: RecyclerView.ViewHolder)
+        fun onCheckViewClicked(checkView: CheckView, item: Item, holder: RecyclerView.ViewHolder)
     }
 
-    class PreBindInfo(internal var mResize: Int, internal var mPlaceholder: Drawable, internal var mCheckViewCountable: Boolean,
+    class PreBindInfo(internal var mResize: Int, internal var mPlaceholder: Drawable, internal var check_viewCountable: Boolean,
                       internal var mViewHolder: RecyclerView.ViewHolder)
 
 }

@@ -6,5 +6,5 @@ package com.herve.library.matisse.listener
  *
  */
 interface OnCheckedListener {
-    abstract fun onCheck(isChecked: Boolean)
+    fun onCheck(isChecked: Boolean)
 }

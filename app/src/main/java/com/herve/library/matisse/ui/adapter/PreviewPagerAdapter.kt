@@ -23,7 +23,7 @@ import com.herve.library.matisse.internal.entity.Item
 import com.herve.library.matisse.ui.PreviewItemFragment
 import java.util.*
 
-class PreviewPagerAdapter(manager: FragmentManager, private val mListener: OnPrimaryItemSetListener) : FragmentPagerAdapter(manager) {
+class PreviewPagerAdapter(manager: FragmentManager, private val mListener: OnPrimaryItemSetListener?) : FragmentPagerAdapter(manager) {
 
     private val mItems = ArrayList<Item>()
 
@@ -38,7 +38,7 @@ class PreviewPagerAdapter(manager: FragmentManager, private val mListener: OnPri
     override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
         super.setPrimaryItem(container, position, `object`)
         super.setPrimaryItem(container, position, `object`)
-        mListener.onPrimaryItemSet(position)
+        mListener?.onPrimaryItemSet(position)
     }
 
     fun getMediaItem(position: Int): Item {

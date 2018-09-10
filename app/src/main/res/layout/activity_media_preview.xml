@@ -42,7 +42,6 @@
             android:padding="16dp"
             android:layout_gravity="start"
             android:text="@string/button_back"
-            android:textColor="?attr/preview.bottomToolbar.back.textColor"
             android:textSize="16sp"/>
 
 
@@ -81,7 +80,6 @@
                     android:paddingStart="4dp"
                     android:paddingLeft="4dp"
                     android:text="@string/button_original"
-                    android:textColor="?attr/preview.bottomToolbar.back.textColor"
                     android:textSize="14sp" />
 
             </LinearLayout>
@@ -89,7 +87,7 @@
 
 
             <TextView
-                android:id="@+id/size"
+                android:id="@+id/tvSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -98,8 +96,6 @@
                 android:visibility="gone"/>
         </LinearLayout>
 
-
-
         <TextView
             android:id="@+id/button_apply"
             android:layout_width="wrap_content"
@@ -107,7 +103,6 @@
             android:layout_gravity="end"
             android:foreground="?selectableItemBackground"
             android:padding="16dp"
-            android:textColor="?attr/preview.bottomToolbar.apply.textColor"
             android:textSize="16sp"/>
 
     </FrameLayout>

@@ -19,7 +19,7 @@ import android.database.Cursor
 import android.provider.MediaStore
 import android.support.v7.widget.RecyclerView
 
-abstract class RecyclerViewCursorAdapter<VH : RecyclerView.ViewHolder> internal constructor(c: Cursor) : RecyclerView.Adapter<VH>() {
+abstract class RecyclerViewCursorAdapter<VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
 
     var cursor: Cursor? = null
         private set
@@ -27,7 +27,6 @@ abstract class RecyclerViewCursorAdapter<VH : RecyclerView.ViewHolder> internal 
 
     init {
         setHasStableIds(true)
-        swapCursor(c)
     }
 
     protected abstract fun onBindViewHolder(holder: VH, cursor: Cursor)

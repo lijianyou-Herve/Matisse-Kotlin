@@ -16,7 +16,6 @@
 package com.zhihu.matisse.ui
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.PorterDuff
@@ -31,22 +30,25 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.LinearLayout
-import android.widget.TextView
 import com.herve.library.matisse.R
 import com.herve.library.matisse.internal.entity.Album
+import com.herve.library.matisse.internal.entity.Item
 import com.herve.library.matisse.internal.entity.SelectionSpec
 import com.herve.library.matisse.internal.utils.MediaStoreCompat
 import com.herve.library.matisse.internal.utils.PhotoMetadataUtils
+import com.herve.library.matisse.ui.AlbumPreviewActivity
 import com.herve.library.matisse.ui.BasePreviewActivity
-import com.herve.library.matisse.ui.MediaSelectionFragment
+import com.herve.library.matisse.ui.SelectedPreviewActivity
 import com.zhihu.matisse.internal.model.AlbumCollection
 import com.zhihu.matisse.internal.model.SelectedItemCollection
+import com.zhihu.matisse.internal.ui.MediaSelectionFragment
 import com.zhihu.matisse.internal.ui.adapter.AlbumMediaAdapter
 import com.zhihu.matisse.internal.ui.adapter.AlbumsAdapter
 import com.zhihu.matisse.internal.ui.widget.AlbumsSpinner
 import com.zhihu.matisse.internal.ui.widget.CheckRadioView
 import com.zhihu.matisse.internal.ui.widget.IncapableDialog
 import com.zhihu.matisse.internal.utils.PathUtils
+import kotlinx.android.synthetic.main.activity_matisse.*
 import java.lang.RuntimeException
 import java.util.*
 
@@ -60,10 +62,8 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
     private val mSelectedCollection = SelectedItemCollection(this)
     private var mSpec: SelectionSpec? = null
 
-    private var mAlbumsSpinner: AlbumsSpinner? = null
+    private lateinit var mAlbumsSpinner: AlbumsSpinner
     private var mAlbumsAdapter: AlbumsAdapter? = null
-    private var mButtonPreview: TextView? = null
-    private var mButtonApply: TextView? = null
     private var mContainer: View? = null
     private var mEmptyView: View? = null
 
@@ -105,8 +105,6 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
         ta.recycle()
         navigationIcon!!.setColorFilter(color, PorterDuff.Mode.SRC_IN)
 
-        mButtonPreview = findViewById<View>(R.id.button_preview) as TextView
-        mButtonApply = findViewById<View>(R.id.button_apply) as TextView
         mButtonPreview!!.setOnClickListener(this)
         mButtonApply!!.setOnClickListener(this)
         mContainer = findViewById(R.id.container)
@@ -121,12 +119,13 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
         }
         updateBottomToolbar()
 
-        mAlbumsAdapter = AlbumsAdapter(this, null!!, false)
+        mAlbumsAdapter = AlbumsAdapter(this, false)
+
         mAlbumsSpinner = AlbumsSpinner(this)
-        mAlbumsSpinner!!.setOnItemSelectedListener(this)
-        mAlbumsSpinner!!.setSelectedTextView(findViewById<View>(R.id.selected_album) as TextView)
-        mAlbumsSpinner!!.setPopupAnchorView(findViewById(R.id.toolbar))
-        mAlbumsSpinner!!.setAdapter(mAlbumsAdapter!!)
+        mAlbumsSpinner.setOnItemSelectedListener(this)
+        mAlbumsSpinner.setSelectedTextView(selected_album)
+        mAlbumsSpinner.setPopupAnchorView(toolbar)
+        mAlbumsSpinner.setAdapter(mAlbumsAdapter!!)
         mAlbumCollection.onCreate(this, this)
         mAlbumCollection.onRestoreInstanceState(savedInstanceState)
         mAlbumCollection.loadAlbums()
@@ -176,8 +175,8 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
                 val selectedPaths = ArrayList<String>()
                 if (selected != null) {
                     for (item in selected) {
-                        selectedUris.add(item.contentUri)
-                        selectedPaths.add(PathUtils.getPath(this, item.contentUri))
+                        selectedUris.add(item.getContentUri())
+                        selectedPaths.add(PathUtils.getPath(this, item.getContentUri())!!)
                     }
                 }
                 result.putParcelableArrayListExtra(EXTRA_RESULT_SELECTION, selectedUris)
@@ -199,9 +198,9 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
             val contentUri = mMediaStoreCompat!!.currentPhotoUri
             val path = mMediaStoreCompat!!.currentPhotoPath
             val selected = ArrayList<Uri>()
-            selected.add(contentUri)
+            selected.add(contentUri!!)
             val selectedPath = ArrayList<String>()
-            selectedPath.add(path)
+            selectedPath.add(path!!)
             val result = Intent()
             result.putParcelableArrayListExtra(EXTRA_RESULT_SELECTION, selected)
             result.putStringArrayListExtra(EXTRA_RESULT_SELECTION_PATH, selectedPath)
@@ -265,7 +264,7 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
         for (i in 0 until selectedCount) {
             val item = mSelectedCollection.asList()[i]
 
-            if (item.isImage) {
+            if (item.isImage()) {
                 val size = PhotoMetadataUtils.getSizeInMB(item.size)
                 if (size > mSpec!!.originalMaxSize) {
                     count++
@@ -276,12 +275,12 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
     }
 
     override fun onClick(v: View) {
-        if (v.id == R.id.button_preview) {
+        if (v.id == R.id.mButtonPreview) {
             val intent = Intent(this, SelectedPreviewActivity::class.java)
             intent.putExtra(BasePreviewActivity.EXTRA_DEFAULT_BUNDLE, mSelectedCollection.dataWithBundle)
             intent.putExtra(BasePreviewActivity.EXTRA_RESULT_ORIGINAL_ENABLE, mOriginalEnable)
             startActivityForResult(intent, REQUEST_CODE_PREVIEW)
-        } else if (v.id == R.id.button_apply) {
+        } else if (v.id == R.id.mButtonApply) {
             val result = Intent()
             val selectedUris = mSelectedCollection.asListOfUri() as ArrayList<Uri>
             result.putParcelableArrayListExtra(EXTRA_RESULT_SELECTION, selectedUris)
@@ -304,7 +303,7 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
             mOriginal!!.setChecked(mOriginalEnable)
 
             if (mSpec!!.onCheckedListener != null) {
-                mSpec!!.onCheckedListener.onCheck(mOriginalEnable)
+                mSpec!!.onCheckedListener?.onCheck(mOriginalEnable)
             }
         }
     }
@@ -313,7 +312,7 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
         mAlbumCollection.setStateCurrentSelection(position)
         mAlbumsAdapter!!.cursor.moveToPosition(position)
         val album = Album.valueOf(mAlbumsAdapter!!.cursor)
-        if (album.isAll && SelectionSpec.getInstance().capture) {
+        if (album.isAll() && SelectionSpec.getInstance().capture) {
             album.addCaptureCount()
         }
         onAlbumSelected(album)
@@ -332,7 +331,7 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
             mAlbumsSpinner!!.setSelection(this@MatisseActivity,
                     mAlbumCollection.currentSelection)
             val album = Album.valueOf(cursor)
-            if (album.isAll && SelectionSpec.getInstance().capture) {
+            if (album.isAll() && SelectionSpec.getInstance().capture) {
                 album.addCaptureCount()
             }
             onAlbumSelected(album)
@@ -344,7 +343,7 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
     }
 
     private fun onAlbumSelected(album: Album) {
-        if (album.isAll && album.isEmpty) {
+        if (album.isAll() && album.isEmpty()) {
             mContainer!!.visibility = View.GONE
             mEmptyView!!.visibility = View.VISIBLE
         } else {
@@ -363,7 +362,7 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
         updateBottomToolbar()
 
         if (mSpec!!.onSelectedListener != null) {
-            mSpec!!.onSelectedListener.onSelected(
+            mSpec!!.onSelectedListener?.onSelected(
                     mSelectedCollection.asListOfUri(), mSelectedCollection.asListOfString())
         }
     }
@@ -396,10 +395,6 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
         private val REQUEST_CODE_CAPTURE = 24
         val CHECK_STATE = "checkState"
 
-        fun launch(context: Context) {
-            val intent = Intent(context, MatisseActivity::class.java)
-            context.startActivity(intent)
-        }
     }
 
 }
