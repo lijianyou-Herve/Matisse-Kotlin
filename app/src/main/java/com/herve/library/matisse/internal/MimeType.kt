@@ -13,8 +13,7 @@ import java.util.*
  * @author  Lijianyou
  *
  */
-enum class MimeType {
-
+enum class MimeType(val mimeTypeName: String, val extensions: Set<String>) {
 
     // ============== images ==============
 
@@ -70,14 +69,6 @@ enum class MimeType {
             "avi"
     ));
 
-    private var mimeTypeName: String
-    private var extensions: Set<String>
-
-    constructor(mimeTypeName: String, extensions: Set<String>) {
-        this.mimeTypeName = mimeTypeName
-        this.extensions = extensions
-    }
-
     override fun toString(): String {
         return mimeTypeName
     }
@@ -109,25 +100,28 @@ enum class MimeType {
         }
         return false
     }
-}
 
-fun ofAll(): Set<MimeType> {
-    return EnumSet.allOf(MimeType::class.java)
-}
+    companion object {
+        fun ofAll(): Set<MimeType> {
+            return EnumSet.allOf(MimeType::class.java)
+        }
 
-fun of(type: MimeType, vararg rest: MimeType): Set<MimeType> {
-    return EnumSet.of(type, *rest)
-}
+        fun of(type: MimeType, vararg rest: MimeType): Set<MimeType> {
+            return EnumSet.of(type, *rest)
+        }
 
-fun ofImage(): Set<MimeType> {
-    return EnumSet.of(MimeType.JPEG, MimeType.PNG, MimeType.GIF, MimeType.BMP, MimeType.WEBP)
-}
+        fun ofImage(): Set<MimeType> {
+            return EnumSet.of(MimeType.JPEG, MimeType.PNG, MimeType.GIF, MimeType.BMP, MimeType.WEBP)
+        }
 
-fun ofVideo(): Set<MimeType> {
-    return EnumSet.of(MimeType.MPEG, MimeType.MP4, MimeType.QUICKTIME, MimeType.THREEGPP, MimeType.THREEGPP2, MimeType.MKV, MimeType.WEBM, MimeType.TS, MimeType.AVI)
-}
+        fun ofVideo(): Set<MimeType> {
+            return EnumSet.of(MimeType.MPEG, MimeType.MP4, MimeType.QUICKTIME, MimeType.THREEGPP, MimeType.THREEGPP2, MimeType.MKV, MimeType.WEBM, MimeType.TS, MimeType.AVI)
+        }
 
+    }
+}
 fun arraySetOf(vararg suffixes: String): Set<String> {
     return ArraySet(Arrays.asList(*suffixes))
 }
+
 

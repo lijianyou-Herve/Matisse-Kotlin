@@ -31,6 +31,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.LinearLayout
 import com.herve.library.matisse.R
+import com.herve.library.matisse.internal.ShowCustomDialog
 import com.herve.library.matisse.internal.entity.Album
 import com.herve.library.matisse.internal.entity.Item
 import com.herve.library.matisse.internal.entity.SelectionSpec
@@ -317,6 +318,8 @@ class MatisseActivity : AppCompatActivity(), AlbumCollection.AlbumCallbacks, Ada
         }
         onAlbumSelected(album)
     }
+
+    private lateinit var showCustomDialog: ShowCustomDialog
 
     override fun onNothingSelected(parent: AdapterView<*>) {
 

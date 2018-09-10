@@ -7,9 +7,9 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.herve.library.matisse.Matisse
 import com.herve.library.matisse.R
+import com.herve.library.matisse.internal.MimeType.Companion.ofAll
 import com.herve.library.matisse.internal.entity.CaptureStrategy
 import com.herve.library.matisse.internal.filter.Filter
-import com.herve.library.matisse.internal.ofAll
 import com.herve.library.matisse.listener.OnCheckedListener
 import com.herve.library.matisse.listener.OnSelectedListener
 import com.zhihu.matisse.sample.GifSizeFilter
@@ -23,11 +23,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         btn_media_store.setOnClickListener {
             Matisse.from(this@MainActivity)
                     .choose(ofAll(), false)
                     .countable(true)
                     .capture(true)
+                    .theme(R.style.AppTheme)
                     .captureStrategy(
                             CaptureStrategy(true, "com.zhihu.matisse.sample.fileprovider"))
                     .maxSelectable(9)
